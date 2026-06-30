@@ -1,0 +1,41 @@
+{
+  "name": "ulw-prompt-builder",
+  "version": "1.0.0",
+  "description": "Turn a vague idea into an optimized copy-paste prompt for lazycodex/OmO $ulw-plan or $ulw-loop. Outputs prompt text only; never runs the target skill.",
+  "author": {
+    "name": "devswha",
+    "url": "https://github.com/devswha"
+  },
+  "homepage": "https://github.com/devswha/ulw-prompt-builder",
+  "repository": "https://github.com/devswha/ulw-prompt-builder",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "codex-plugin",
+    "skills",
+    "lazycodex",
+    "omo",
+    "ulw-loop",
+    "ulw-plan",
+    "prompt"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "ULW Prompt Builder",
+    "shortDescription": "Optimal prompt builder for $ulw-plan / $ulw-loop",
+    "longDescription": "Interactively turns a vague idea into the optimal copy-paste prompt for lazycodex/OmO's $ulw-plan (planning) or $ulw-loop (evidence-gated execution). Recommends the target, asks 3-5 targeted questions, fills the full reward structure (loop: scenario/expectedEvidence + completion promise + adversarial + verification + Must-NOT; plan: intent signal + owner-decision + context), and selectively weaves in relevant OmO $-skills. Outputs prompt text only and never runs the target skill.",
+    "developerName": "devswha",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Workflow",
+      "Context Injection"
+    ],
+    "websiteURL": "https://github.com/devswha/ulw-prompt-builder",
+    "brandColor": "#7C3AED",
+    "defaultPrompt": [
+      "$ulw-prompt-builder 이 아이디어를 ulw-loop 프롬프트로 만들어줘",
+      "$ulw-prompt-builder turn this idea into a $ulw-plan prompt"
+    ],
+    "screenshots": []
+  }
+}
