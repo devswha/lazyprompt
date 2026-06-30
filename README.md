@@ -19,19 +19,19 @@
 ### 방법 1 — Codex 마켓플레이스 (권장, 가장 간단)
 
 ```bash
-codex plugin marketplace add devswha/ulw-prompt-builder
+codex plugin marketplace add devswha/lazyprompt
 # Codex 재시작 후, 플러그인 디렉터리에서 "devswha Skills" 마켓플레이스 → ulw-prompt-builder 설치
 ```
 
-또는 Codex 안에서 `/plugins` → **Add Marketplace** → `https://github.com/devswha/ulw-prompt-builder` 입력 후 `ulw-prompt-builder` 설치.
+또는 Codex 안에서 `/plugins` → **Add Marketplace** → `https://github.com/devswha/lazyprompt` 입력 후 `ulw-prompt-builder` 설치.
 
 ### 방법 2 — 레포 클론 후 그 안에서 Codex 실행 (자동 discovery)
 
 Codex는 실행 디렉터리의 `.agents/skills/`를 자동으로 읽습니다.
 
 ```bash
-git clone https://github.com/devswha/ulw-prompt-builder
-cd ulw-prompt-builder
+git clone https://github.com/devswha/lazyprompt
+cd lazyprompt
 codex          # 이 레포 안에서 실행하면 $ulw-prompt-builder 가 바로 잡힘
 ```
 

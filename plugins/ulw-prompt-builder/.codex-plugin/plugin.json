@@ -6,8 +6,8 @@
     "name": "devswha",
     "url": "https://github.com/devswha"
   },
-  "homepage": "https://github.com/devswha/ulw-prompt-builder",
-  "repository": "https://github.com/devswha/ulw-prompt-builder",
+  "homepage": "https://github.com/devswha/lazyprompt",
+  "repository": "https://github.com/devswha/lazyprompt",
   "license": "MIT",
   "keywords": [
     "codex",
@@ -30,7 +30,7 @@
       "Workflow",
       "Context Injection"
     ],
-    "websiteURL": "https://github.com/devswha/ulw-prompt-builder",
+    "websiteURL": "https://github.com/devswha/lazyprompt",
     "brandColor": "#7C3AED",
     "defaultPrompt": [
       "$ulw-prompt-builder 이 아이디어를 ulw-loop 프롬프트로 만들어줘",
