@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/mascot.png" width="200" alt="lazyprompt mascot" />
+
 # lazyprompt
 
 **막연한 아이디어를 [lazycodex / OmO](https://github.com/code-yeongyu/lazycodex)의 `$ulw-plan`·`$ulw-loop`가 가장 잘 먹는 최적 프롬프트로 바꿔주는 Codex 스킬**
