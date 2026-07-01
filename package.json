@@ -1,6 +1,6 @@
 {
   "name": "lazyprompt",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "description": "Turn a vague idea into an optimized copy-paste prompt for lazycodex/OmO $ulw-plan or $ulw-loop. Outputs prompt text only; never runs the target skill.",
   "license": "MIT",

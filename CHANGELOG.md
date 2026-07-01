@@ -11,6 +11,8 @@ via `npm run version:sync`. See [Versioning](README.md) for the release workflow
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-07-01
+
 ### Changed
 - **Auto-triggered deep interview (OmX-style routing).** `$lazyprompt` now gauges
   ambiguity first: clear inputs still produce a one-shot prompt, while vague
@@ -66,6 +68,7 @@ via `npm run version:sync`. See [Versioning](README.md) for the release workflow
   in sync with the packaged copy.
 - Skill contract tests (`test/skill-contract.test.mjs`).
 
-[Unreleased]: https://github.com/devswha/lazyprompt/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/devswha/lazyprompt/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/devswha/lazyprompt/releases/tag/v1.2.0
 [1.1.0]: https://github.com/devswha/lazyprompt/releases/tag/v1.1.0
 [1.0.0]: https://github.com/devswha/lazyprompt/releases/tag/v1.0.0
