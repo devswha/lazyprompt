@@ -13,10 +13,12 @@ description: Convert vague ideas into optimized copy-paste prompts for OmO $ulw-
 - 출력은 **프롬프트 텍스트뿐**이다. 이 스킬은 `$ulw-plan`, `$ulw-loop`, 그 밖의 `$`-스킬을 **직접 실행하지 않는다**.
   생성된 프롬프트는 사용자가 직접 복사해 해당 스킬에 붙여넣는다.
 - lazycodex/OmO 설치 여부와 무관하게 동작한다(알고리즘 지식과 `$`-스킬 카탈로그를 이 문서 안에 내장).
+- 최종 응답은 스킬 자체의 상태 설명, 인사, 실행 로그, 별도 preamble 없이 **Part A/B/C만** 출력한다.
+- 사용자가 타깃 스킬에 붙여넣을 것은 **Part A의 명령만**이다. Part B/C는 사용자가 검토하는 설명이며 `$ulw-plan`/`$ulw-loop` 입력에 섞지 않는다.
 
 ## 목적과 하드 경계 (Purpose & hard boundaries)
 - 목적: 막연한 아이디어 → 타깃 스킬이 최적 결과를 내도록 구조화된 시드 프롬프트 텍스트.
-- 자동 실행 금지: `$ulw-plan`, `$ulw-loop`, `$LSP`, `$AST-grep` 등은 **출력 텍스트 안에만** 등장한다.
+- 자동 실행 금지: `$ulw-plan`, `$ulw-loop`, `$lsp`, `$ast-grep` 등은 **출력 텍스트 안에만** 등장한다.
 - 날조 금지: 사용자가 확인하지 않은 성공기준·제약은 지어내지 않는다. 모르면 `사용자 미확인` 또는 `TBD by target skill`로 표시.
 - 카탈로그 밖 `$skill`은 만들지 않는다.
 
@@ -38,6 +40,9 @@ description: Convert vague ideas into optimized copy-paste prompts for OmO $ulw-
 5. 보상요소 템플릿을 채운다. 모르는 값은 날조하지 말고 `사용자 미확인` / `TBD by target skill`로 둔다.
 6. 태스크 유형을 매핑표와 대조해 **관련 `$skill`만** 본문 적절한 위치에 넣는다(매칭 없으면 넣지 않음, graceful).
 7. 항상 **3부로 출력**한다: Part A 복붙용 전체 명령 / Part B 구조화 본문 / Part C 플래그 선택 이유.
+8. 사용자가 "프롬프트 텍스트만"이라고 해도 이는 3부 외 잡담을 빼라는 뜻으로 해석한다. **Part A only**, "명령만", "복붙 명령만"처럼 명시한 경우에만 Part B/C를 생략한다.
+9. Part A는 타깃 스킬이 받을 입력만 담는다. Part B/C의 설명 문장, rationale, golden-set 검증 문구, 스킬 자체 메타 설명을 Part A 안에 넣지 않는다.
+10. Part A의 `<structured body>`는 **bullet/번호 목록 없이 한 개의 연속 브리프**로 쓴다. `ulw-loop create-goals`는 bullet 줄을 별도 goal로 파싱하므로, Success criteria와 Verification은 세미콜론/파이프 구분의 인라인 문장으로 압축한다.
 
 ## 타깃별 보상요소 체크리스트
 
@@ -57,14 +62,14 @@ description: Convert vague ideas into optimized copy-paste prompts for OmO $ulw-
 4. Adversarial cases: 절대 깨지면 안 되는 엣지/적대 케이스는? → 적대적/엣지 케이스.
 5. Verification & Must-NOT: 실행할 검증 명령/절차와 **절대 하면 안 되는 일**은? → 검증 명령 + Must-NOT.
 
-## OmO `$`-skill mapping table (snapshot: 2026-06)
-2026-06 기준 OmO 공개 `$`-스킬. 카탈로그 밖 스킬은 만들지 않는다.
+## OmO `$`-skill mapping table (snapshot: local OmO 4.13.0, 2026-07)
+로컬 OmO 4.13.0 기준 공개 `$`-스킬. 카탈로그 밖 스킬은 만들지 않는다.
 
 | 태스크 유형 | `$skill` |
 |------------|----------|
-| 프런트엔드/UI/디자인 | `$frontend-ui-ux` |
-| 코드 구조 검색 | `$AST-grep` |
-| 정의·참조·진단 | `$LSP` |
+| 프런트엔드/UI/디자인 | `$frontend` |
+| 코드 구조 검색 | `$ast-grep` |
+| 정의·참조·진단 | `$lsp` |
 | 언어별 엄격 규율(TS/Rust/Py/Go) | `$programming` |
 | AI 흔적 정리·리팩터 | `$remove-ai-slops` |
 | 구현 후 리뷰 | `$review-work` |
@@ -83,8 +88,10 @@ description: Convert vague ideas into optimized copy-paste prompts for OmO $ulw-
 ### plan output template
 Part A — Copy-paste command:
 ```
-$ulw-plan "<structured body>"
+$ulw-plan "<single continuous structured brief; no markdown bullets inside this quoted body>"
 ```
+붙여넣기 범위: 위 명령만 복사한다. 아래 Part B/C는 복사 대상이 아니다.
+
 Part B — Structured body:
 - Intent signal: `<CLEAR|UNCLEAR|interview-me|high-accuracy>`
 - What to plan: `<WHAT>`
@@ -100,8 +107,10 @@ Part C — Flag rationale:
 ### loop output template
 Part A — Copy-paste command:
 ```
-$ulw-loop "<structured body>" --completion-promise="<promise>" --max-iterations=<N>
+$ulw-loop "<single continuous structured brief; no markdown bullets inside this quoted body>" --completion-promise="<promise>" --max-iterations=<N>
 ```
+붙여넣기 범위: 위 명령만 복사한다. 아래 Part B/C는 복사 대상이 아니다.
+
 Part B — Structured body:
 - Desired outcome: `<observable result>`
 - Success criteria:
@@ -123,14 +132,14 @@ Part C — Flag rationale:
 
 | ID | Idea | Target | Expected skeleton | Required tokens | Forbidden tokens | Evidence for PASS |
 |---|---|---|---|---|---|---|
-| G1 greenfield plan UI | 새 대시보드 앱의 정보구조와 첫 화면 UX를 정하고 싶다 | plan | A `$ulw-plan`; B Intent signal/What to plan/Owner decisions/Context & constraints/Optional skill hints; C rationale | `$ulw-plan`, `Intent signal`, `Owner decisions`, `Context & constraints`, `$frontend-ui-ux`, `decision-complete` | `$ulw-loop`, `--completion-promise`, `$fake-skill`, `자동 실행` | 시뮬레이션 출력이 target=plan, 3부=yes, 보상요소=yes, skill 토큰 제한 |
-| G2 greenfield loop backend | Node 백엔드 로그인 API 구현 실행 프롬프트가 필요 | loop | A `$ulw-loop` + `--completion-promise` + `--max-iterations`; B Desired/scenario·expectedEvidence/promise/Adversarial/Verification/Must-NOT; C rationale | `$ulw-loop`, `scenario`, `expectedEvidence`, `completion promise`, `Adversarial`, `Verification`, `Must-NOT`, `$programming`, `$review-work` | `$ulw-plan`, `$frontend-ui-ux`, `$fake-skill` | auth 엣지·검증이 답변 기반 또는 `사용자 미확인` 표기 |
-| G3 brownfield plan backend | 기존 결제 모듈 리팩터링 계획 + owner tradeoff 표면화 | plan | `$ulw-plan`; Intent `CLEAR`/`high-accuracy`; payment owner decisions; 기존 파일 context; 코드 탐색 skill | `$ulw-plan`, `CLEAR`, `high-accuracy`, `Owner decisions`, `payment`, `$LSP`, `$AST-grep`, `$review-work` | `$ulw-loop`, `--max-iterations`, `$frontend-ui-ux` | owner-decision이 constraint와 분리 표면화 |
-| G4 brownfield loop UI | 기존 설정 화면 접근성 버그 수정 + 검증 반복 | loop | `$ulw-loop`; 접근성 scenario·expectedEvidence; promise; keyboard·screen reader adversarial; manual QA; Must-NOT regressions; UI·review skill | `$ulw-loop`, `scenario`, `expectedEvidence`, `keyboard`, `screen reader`, `Verification`, `Must-NOT`, `$frontend-ui-ux`, `$review-work` | `$ulw-plan`, `$fake-skill` | 접근성 evidence + 무관 skill 미주입 |
+| G1 greenfield plan UI | 새 대시보드 앱의 정보구조와 첫 화면 UX를 정하고 싶다 | plan | A `$ulw-plan`; B Intent signal/What to plan/Owner decisions/Context & constraints/Optional skill hints; C rationale | `$ulw-plan`, `Intent signal`, `Owner decisions`, `Context & constraints`, `$frontend`, `decision-complete` | `$ulw-loop`, `--completion-promise`, `$fake-skill`, `자동 실행` | 시뮬레이션 출력이 target=plan, 3부=yes, 보상요소=yes, skill 토큰 제한 |
+| G2 greenfield loop backend | Node 백엔드 로그인 API 구현 실행 프롬프트가 필요 | loop | A `$ulw-loop` + `--completion-promise` + `--max-iterations`; B Desired/scenario·expectedEvidence/promise/Adversarial/Verification/Must-NOT; C rationale | `$ulw-loop`, `scenario`, `expectedEvidence`, `completion promise`, `Adversarial`, `Verification`, `Must-NOT`, `$programming`, `$review-work` | `$ulw-plan`, `$frontend`, `$fake-skill` | auth 엣지·검증이 답변 기반 또는 `사용자 미확인` 표기 |
+| G3 brownfield plan backend | 기존 결제 모듈 리팩터링 계획 + owner tradeoff 표면화 | plan | `$ulw-plan`; Intent `CLEAR`/`high-accuracy`; payment owner decisions; 기존 파일 context; 코드 탐색 skill | `$ulw-plan`, `CLEAR`, `high-accuracy`, `Owner decisions`, `payment`, `$lsp`, `$ast-grep`, `$review-work` | `$ulw-loop`, `--max-iterations`, `$frontend` | owner-decision이 constraint와 분리 표면화 |
+| G4 brownfield loop UI | 기존 설정 화면 접근성 버그 수정 + 검증 반복 | loop | `$ulw-loop`; 접근성 scenario·expectedEvidence; promise; keyboard·screen reader adversarial; manual QA; Must-NOT regressions; UI·review skill | `$ulw-loop`, `scenario`, `expectedEvidence`, `keyboard`, `screen reader`, `Verification`, `Must-NOT`, `$frontend`, `$review-work` | `$ulw-plan`, `$fake-skill` | 접근성 evidence + 무관 skill 미주입 |
 | G5 greenfield plan ambiguous | 우리 서비스에 검색을 넣고 싶다 | plan | `$ulw-plan`; Intent `UNCLEAR`/`interview-me`; 검색 owner decisions(scope/ranking/cost); context; 관련 시에만 skill | `$ulw-plan`, `UNCLEAR`, `interview-me`, `Owner decisions`, `search scope`, `ranking`, `cost`, `Context` | `$ulw-loop`, `--completion-promise`, `fabricated metrics` | 미확인 지표는 `사용자 미확인` 또는 타깃 위임 |
-| G6 brownfield loop cleanup | AI가 만든 어색한 코드 정리 + 테스트 통과 | loop | `$ulw-loop`; cleanup desired; expectedEvidence(tests/diff); promise; adversarial no behavior change; verification; Must-NOT broad rewrite; cleanup·review·programming skill | `$ulw-loop`, `expectedEvidence`, `tests`, `no behavior change`, `Must-NOT`, `$remove-ai-slops`, `$review-work`, `$programming` | `$ulw-plan`, `$frontend-ui-ux`, `broad rewrite` | 동작 보존 + broad rewrite 없음 |
+| G6 brownfield loop cleanup | AI가 만든 어색한 코드 정리 + 테스트 통과 | loop | `$ulw-loop`; cleanup desired; expectedEvidence(tests/diff); promise; adversarial no behavior change; verification; Must-NOT broad rewrite; cleanup·review·programming skill | `$ulw-loop`, `expectedEvidence`, `tests`, `no behavior change`, `Must-NOT`, `$remove-ai-slops`, `$review-work`, `$programming` | `$ulw-plan`, `$frontend`, `broad rewrite` | 동작 보존 + broad rewrite 없음 |
 
 ## Maintenance note
 - 단일 파일 예산: 약 260줄. 초과 시 중복 설명을 줄이되 필수 체크리스트·골든셋은 유지한다.
-- 카탈로그 snapshot은 **2026-06** 기준 OmO 공개 `$`-스킬이다. OmO 스킬 목록이 바뀌면(drift) `OmO $-skill mapping table`, 골든셋 `required tokens`/`forbidden tokens`를 함께 수동 갱신한다.
+- 카탈로그 snapshot은 로컬 OmO 4.13.0, **2026-07** 기준 공개 `$`-스킬이다. OmO 스킬 목록이 바뀌면(drift) `OmO $-skill mapping table`, 골든셋 `required tokens`/`forbidden tokens`를 함께 수동 갱신한다.
 - lazycodex 보상구조(`$ulw-plan`/`$ulw-loop`의 요소·플래그)가 바뀌면 질문 매핑과 출력 템플릿을 함께 수동 갱신한다.

@@ -1,6 +1,6 @@
 {
   "name": "ulw-prompt-builder",
-  "version": "1.0.0",
+  "version": "1.0.0+codex.20260701060710",
   "description": "Turn a vague idea into an optimized copy-paste prompt for lazycodex/OmO $ulw-plan or $ulw-loop. Outputs prompt text only; never runs the target skill.",
   "author": {
     "name": "devswha",
@@ -23,7 +23,7 @@
   "interface": {
     "displayName": "ULW Prompt Builder",
     "shortDescription": "Optimal prompt builder for $ulw-plan / $ulw-loop",
-    "longDescription": "Interactively turns a vague idea into the optimal copy-paste prompt for lazycodex/OmO's $ulw-plan (planning) or $ulw-loop (evidence-gated execution). Recommends the target, asks 3-5 targeted questions, fills the full reward structure (loop: scenario/expectedEvidence + completion promise + adversarial + verification + Must-NOT; plan: intent signal + owner-decision + context), and selectively weaves in relevant OmO $-skills. Outputs prompt text only and never runs the target skill.",
+    "longDescription": "Turns a vague idea into the optimal copy-paste prompt for lazycodex/OmO's $ulw-plan (planning) or $ulw-loop (evidence-gated execution). Recommends the target, asks only when missing information would cause a wrong prompt, fills the reward structure (loop: scenario/expectedEvidence + completion promise + adversarial + verification + Must-NOT; plan: intent signal + owner-decision + context), and selectively weaves in relevant OmO $-skills. Outputs prompt text only and never runs the target skill.",
     "developerName": "devswha",
     "category": "Developer Tools",
     "capabilities": [

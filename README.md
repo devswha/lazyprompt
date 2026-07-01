@@ -25,7 +25,7 @@ codex plugin marketplace add devswha/lazyprompt
 $ulw-prompt-builder 결제 모듈 리팩터링 계획 세우고 싶어
 ```
 
-스킬이 `plan` vs `loop`를 추론하고, 충분하면 바로 그대로 복붙할 수 있는 프롬프트를 뱉습니다.
+스킬이 `plan` vs `loop`를 추론하고, 충분하면 바로 그대로 복붙할 수 있는 프롬프트를 3부로 뱉습니다.
 정말 필요한 정보가 비어 있을 때만 한 번에 묶어 묻습니다.
 
 ---
@@ -38,7 +38,8 @@ $ulw-prompt-builder 결제 모듈 리팩터링 계획 세우고 싶어
 
 1. **타깃 추론** — 아이디어가 `ulw-plan`(계획)용인지 `ulw-loop`(실행)용인지 추론.
 2. **바로 출력 우선** — 충분하면 질문 없이 생성하고, 부족할 때만 필요한 항목을 한 번에 질문.
-3. **3부 출력** — 복붙용 명령 + 구조화 본문 + 플래그 선택 이유.
+3. **3부 출력** — Part A 복붙용 명령 + Part B 구조화 본문 + Part C 플래그 선택 이유.
+4. **안전한 복붙 경계** — 실제 `$ulw-plan`/`$ulw-loop`에 붙여넣을 것은 Part A의 명령뿐입니다.
 
 ## 무엇이 채워지나 (Reward structure)
 
@@ -47,7 +48,7 @@ $ulw-prompt-builder 결제 모듈 리팩터링 계획 세우고 싶어
 | `$ulw-loop` | 성공기준(`scenario`/`expectedEvidence`) · 완료 약속 · 적대적/엣지 케이스 · 검증 명령 · `Must-NOT` · `--completion-promise` · `--max-iterations` |
 | `$ulw-plan` | 의도 신호(`CLEAR`/`UNCLEAR`/`interview-me`/`high-accuracy`) · owner-decision 표면화 · 맥락/제약 |
 
-태스크에 맞는 OmO `$`-스킬도 **선택적으로** 끼워 넣습니다 — 검증→`$LSP`/`$AST-grep`, UI→`$frontend-ui-ux`, 마무리→`$review-work`/`$remove-ai-slops` (매칭 없으면 넣지 않음).
+태스크에 맞는 OmO `$`-스킬도 **선택적으로** 끼워 넣습니다 — 검증→`$lsp`/`$ast-grep`, UI→`$frontend`, 마무리→`$review-work`/`$remove-ai-slops` (매칭 없으면 넣지 않음).
 
 ## 설치 (Install)
 
@@ -90,11 +91,11 @@ Codex composer에서 `$`로 스킬 목록을 열거나 직접 호출:
 $ulw-prompt-builder Node 백엔드에 로그인 API 구현시키고 싶어
 ```
 
-스킬이 `loop`를 추론하고 아래 형태로 바로 출력합니다:
+스킬이 `loop`를 추론하고 필요한 보상요소를 채운 뒤, 아래 형태로 출력합니다:
 
 ```text
 Part A — 복붙용 명령
-$ulw-loop "<구조화 본문>" --completion-promise="<DONE>" --max-iterations=25
+$ulw-loop "<bullet/번호 목록 없는 한 개의 연속 브리프>" --completion-promise="<DONE>" --max-iterations=25
 
 Part B — 구조화 본문
 - Desired outcome / Success criteria(scenario·expectedEvidence)
@@ -105,7 +106,9 @@ Part C — 플래그 선택 이유
 - completion-promise / max-iterations / $skill 주입 근거
 ```
 
-그대로 복사해 `$ulw-loop`(또는 `$ulw-plan`)에 붙여넣으면 끝.
+Part A의 명령만 복사해 `$ulw-loop`(또는 `$ulw-plan`)에 붙여넣으면 끝. Part B/C는 검토용 설명입니다.
+
+> 왜 Part A가 bullet 없는 연속 브리프인가요? `ulw-loop create-goals`는 bullet/번호 줄을 별도 goal 후보로 파싱합니다. Part A를 한 개의 연속 브리프로 유지하면 성공기준과 검증 절차는 풍부하게 전달하면서도 goal 과분할을 피할 수 있습니다.
 
 ## 구조 (Layout)
 
@@ -122,7 +125,7 @@ plugins/ulw-prompt-builder/
 - 대상 스킬을 자동 실행하지 않음 — 프롬프트 텍스트만 출력.
 - 사용자가 확인하지 않은 성공기준·제약을 날조하지 않음.
 - 카탈로그에 없는 `$skill`을 날조하지 않음.
-- OmO `$`-스킬 카탈로그 자동 동기화는 범위 밖 (2026-06 snapshot, 수동 갱신).
+- OmO `$`-스킬 카탈로그 자동 동기화는 범위 밖 (로컬 OmO 4.13.0 / 2026-07 snapshot, 수동 갱신).
 
 ## License
 
