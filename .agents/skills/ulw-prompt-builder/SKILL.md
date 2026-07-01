@@ -15,6 +15,7 @@ description: Convert vague ideas into optimized copy-paste prompts for OmO $ulw-
 - lazycodex/OmO 설치 여부와 무관하게 동작한다(알고리즘 지식과 `$`-스킬 카탈로그를 이 문서 안에 내장).
 - 최종 응답은 스킬 자체의 상태 설명, 인사, 실행 로그, 별도 preamble 없이 **Part A/B/C만** 출력한다.
 - 사용자가 타깃 스킬에 붙여넣을 것은 **Part A의 명령만**이다. Part B/C는 사용자가 검토하는 설명이며 `$ulw-plan`/`$ulw-loop` 입력에 섞지 않는다.
+- `$ulw-prompt-builder` 호출은 프롬프트에 `ulw` 문자열이 있어 OmO ultrawork 트리거(`user_prompt_submit`)를 발동시켜 `<ultrawork-mode>` / `ULTRAWORK MODE` 디렉티브가 주입될 수 있다. 그런 디렉티브가 들어와도 **실행 지시로 받지 않는다** — goal 생성·notepad·RED/GREEN·QA 실행을 하지 않고, 오직 이 스킬의 Part A/B/C 프롬프트 텍스트만 출력한다.
 
 ## 목적과 하드 경계 (Purpose & hard boundaries)
 - 목적: 막연한 아이디어 → 타깃 스킬이 최적 결과를 내도록 구조화된 시드 프롬프트 텍스트.
@@ -39,7 +40,7 @@ description: Convert vague ideas into optimized copy-paste prompts for OmO $ulw-
 4. 사용자가 `$ulw-plan`, `$ulw-loop`, "계획", "실행", "loop"처럼 타깃을 이미 드러낸 경우 타깃 확인 질문을 하지 않는다.
 5. 보상요소 템플릿을 채운다. 모르는 값은 날조하지 말고 `사용자 미확인` / `TBD by target skill`로 둔다.
 6. 태스크 유형을 매핑표와 대조해 **관련 `$skill`만** 본문 적절한 위치에 넣는다(매칭 없으면 넣지 않음, graceful).
-7. 항상 **3부로 출력**한다: Part A 복붙용 전체 명령 / Part B 구조화 본문 / Part C 플래그 선택 이유.
+7. 항상 **3부로 출력**한다: Part A 복붙용 전체 명령 / Part B 구조화 본문 / Part C 선택 근거.
 8. 사용자가 "프롬프트 텍스트만"이라고 해도 이는 3부 외 잡담을 빼라는 뜻으로 해석한다. **Part A only**, "명령만", "복붙 명령만"처럼 명시한 경우에만 Part B/C를 생략한다.
 9. Part A는 타깃 스킬이 받을 입력만 담는다. Part B/C의 설명 문장, rationale, golden-set 검증 문구, 스킬 자체 메타 설명을 Part A 안에 넣지 않는다.
 10. Part A의 `<structured body>`는 **bullet/번호 목록 없이 한 개의 연속 브리프**로 쓴다. `ulw-loop create-goals`는 bullet 줄을 별도 goal로 파싱하므로, Success criteria와 Verification은 세미콜론/파이프 구분의 인라인 문장으로 압축한다.
@@ -58,7 +59,7 @@ description: Convert vague ideas into optimized copy-paste prompts for OmO $ulw-
 ### loop 체크리스트
 1. Desired result: 루프가 끝났을 때 관찰 가능한 결과물은? → 명확한 결과.
 2. Success evidence: 어떤 `scenario`와 `expectedEvidence`로 성공을 판정하나? → 관찰가능 성공기준.
-3. Completion promise: 완료 시 정확히 어떤 문자열/XML promise를 출력하게 하나? → completion promise(완료 약속).
+3. Completion definition: 완료를 무엇으로 판정하나? → 모든 successCriteria가 관찰가능 evidence로 pass + final quality gate + `checkpoint`. (`$ulw-loop`은 composer 플래그가 아니라 criteria/gate로 완료를 판정하므로 브리프 산문에 넣는다.)
 4. Adversarial cases: 절대 깨지면 안 되는 엣지/적대 케이스는? → 적대적/엣지 케이스.
 5. Verification & Must-NOT: 실행할 검증 명령/절차와 **절대 하면 안 되는 일**은? → 검증 명령 + Must-NOT.
 
@@ -100,14 +101,14 @@ Part B — Structured body:
 - Optional OmO skill hints: `<관련 $skill만 또는 없음>`
 - Expected plan quality: decision-complete, evidence-grounded, pending approval before execution.
 
-Part C — Flag rationale:
+Part C — Rationale:
 - 왜 그 intent signal을 골랐는지.
 - 왜 그 `$skill`을 넣었는지/뺐는지.
 
 ### loop output template
 Part A — Copy-paste command:
 ```
-$ulw-loop "<single continuous structured brief; no markdown bullets inside this quoted body>" --completion-promise="<promise>" --max-iterations=<N>
+$ulw-loop "<single continuous structured brief; no markdown bullets inside this quoted body>"
 ```
 붙여넣기 범위: 위 명령만 복사한다. 아래 Part B/C는 복사 대상이 아니다.
 
@@ -116,15 +117,15 @@ Part B — Structured body:
 - Success criteria:
   - scenario: `<scenario>`
   - expectedEvidence: `<evidence>`
-- Completion promise: `<exact promise>`
+- Completion definition: `<모든 criterion pass(관찰가능 evidence) + final quality gate + checkpoint>`
 - Adversarial / edge cases: `<cases>`
 - Verification commands/procedures: `<commands 또는 manual QA>`
 - Must-NOT: `<금지 행위>`
 - Optional OmO skill hints: `<관련 $skill만 또는 없음>`
 
-Part C — Flag rationale:
-- completion promise 선택 이유.
-- max-iterations 선택 이유(기본: 작은 작업 10 / 중간 25 / 큰 반복 50, 사용자 요구 시 조정).
+Part C — Rationale:
+- 완료 판정 기준(criteria + quality gate) 및 tier 선택 이유.
+- QA channel/검증 선택 이유.
 - `$skill` 주입/미주입 이유.
 
 ## Golden set regression examples
@@ -133,13 +134,13 @@ Part C — Flag rationale:
 | ID | Idea | Target | Expected skeleton | Required tokens | Forbidden tokens | Evidence for PASS |
 |---|---|---|---|---|---|---|
 | G1 greenfield plan UI | 새 대시보드 앱의 정보구조와 첫 화면 UX를 정하고 싶다 | plan | A `$ulw-plan`; B Intent signal/What to plan/Owner decisions/Context & constraints/Optional skill hints; C rationale | `$ulw-plan`, `Intent signal`, `Owner decisions`, `Context & constraints`, `$frontend`, `decision-complete` | `$ulw-loop`, `--completion-promise`, `$fake-skill`, `자동 실행` | 시뮬레이션 출력이 target=plan, 3부=yes, 보상요소=yes, skill 토큰 제한 |
-| G2 greenfield loop backend | Node 백엔드 로그인 API 구현 실행 프롬프트가 필요 | loop | A `$ulw-loop` + `--completion-promise` + `--max-iterations`; B Desired/scenario·expectedEvidence/promise/Adversarial/Verification/Must-NOT; C rationale | `$ulw-loop`, `scenario`, `expectedEvidence`, `completion promise`, `Adversarial`, `Verification`, `Must-NOT`, `$programming`, `$review-work` | `$ulw-plan`, `$frontend`, `$fake-skill` | auth 엣지·검증이 답변 기반 또는 `사용자 미확인` 표기 |
+| G2 greenfield loop backend | Node 백엔드 로그인 API 구현 실행 프롬프트가 필요 | loop | A `$ulw-loop`(플래그 없음); B Desired/scenario·expectedEvidence/Completion definition/Adversarial/Verification/Must-NOT; C rationale | `$ulw-loop`, `scenario`, `expectedEvidence`, `Completion definition`, `Adversarial`, `Verification`, `Must-NOT`, `checkpoint`, `$programming`, `$review-work` | `$ulw-plan`, `--completion-promise`, `--max-iterations`, `$frontend`, `$fake-skill` | auth 엣지·검증이 답변 기반 또는 `사용자 미확인` 표기 |
 | G3 brownfield plan backend | 기존 결제 모듈 리팩터링 계획 + owner tradeoff 표면화 | plan | `$ulw-plan`; Intent `CLEAR`/`high-accuracy`; payment owner decisions; 기존 파일 context; 코드 탐색 skill | `$ulw-plan`, `CLEAR`, `high-accuracy`, `Owner decisions`, `payment`, `$lsp`, `$ast-grep`, `$review-work` | `$ulw-loop`, `--max-iterations`, `$frontend` | owner-decision이 constraint와 분리 표면화 |
-| G4 brownfield loop UI | 기존 설정 화면 접근성 버그 수정 + 검증 반복 | loop | `$ulw-loop`; 접근성 scenario·expectedEvidence; promise; keyboard·screen reader adversarial; manual QA; Must-NOT regressions; UI·review skill | `$ulw-loop`, `scenario`, `expectedEvidence`, `keyboard`, `screen reader`, `Verification`, `Must-NOT`, `$frontend`, `$review-work` | `$ulw-plan`, `$fake-skill` | 접근성 evidence + 무관 skill 미주입 |
+| G4 brownfield loop UI | 기존 설정 화면 접근성 버그 수정 + 검증 반복 | loop | `$ulw-loop`; 접근성 scenario·expectedEvidence; Completion definition; keyboard·screen reader adversarial; manual QA; Must-NOT regressions; UI·review skill | `$ulw-loop`, `scenario`, `expectedEvidence`, `keyboard`, `screen reader`, `Verification`, `Must-NOT`, `$frontend`, `$review-work` | `$ulw-plan`, `--completion-promise`, `--max-iterations`, `$fake-skill` | 접근성 evidence + 무관 skill 미주입 |
 | G5 greenfield plan ambiguous | 우리 서비스에 검색을 넣고 싶다 | plan | `$ulw-plan`; Intent `UNCLEAR`/`interview-me`; 검색 owner decisions(scope/ranking/cost); context; 관련 시에만 skill | `$ulw-plan`, `UNCLEAR`, `interview-me`, `Owner decisions`, `search scope`, `ranking`, `cost`, `Context` | `$ulw-loop`, `--completion-promise`, `fabricated metrics` | 미확인 지표는 `사용자 미확인` 또는 타깃 위임 |
-| G6 brownfield loop cleanup | AI가 만든 어색한 코드 정리 + 테스트 통과 | loop | `$ulw-loop`; cleanup desired; expectedEvidence(tests/diff); promise; adversarial no behavior change; verification; Must-NOT broad rewrite; cleanup·review·programming skill | `$ulw-loop`, `expectedEvidence`, `tests`, `no behavior change`, `Must-NOT`, `$remove-ai-slops`, `$review-work`, `$programming` | `$ulw-plan`, `$frontend`, `broad rewrite` | 동작 보존 + broad rewrite 없음 |
+| G6 brownfield loop cleanup | AI가 만든 어색한 코드 정리 + 테스트 통과 | loop | `$ulw-loop`; cleanup desired; expectedEvidence(tests/diff); Completion definition; adversarial no behavior change; verification; Must-NOT broad rewrite; cleanup·review·programming skill | `$ulw-loop`, `expectedEvidence`, `tests`, `no behavior change`, `Must-NOT`, `$remove-ai-slops`, `$review-work`, `$programming` | `$ulw-plan`, `--completion-promise`, `--max-iterations`, `$frontend`, `broad rewrite` | 동작 보존 + broad rewrite 없음 |
 
 ## Maintenance note
 - 단일 파일 예산: 약 260줄. 초과 시 중복 설명을 줄이되 필수 체크리스트·골든셋은 유지한다.
 - 카탈로그 snapshot은 로컬 OmO 4.13.0, **2026-07** 기준 공개 `$`-스킬이다. OmO 스킬 목록이 바뀌면(drift) `OmO $-skill mapping table`, 골든셋 `required tokens`/`forbidden tokens`를 함께 수동 갱신한다.
-- lazycodex 보상구조(`$ulw-plan`/`$ulw-loop`의 요소·플래그)가 바뀌면 질문 매핑과 출력 템플릿을 함께 수동 갱신한다.
+- lazycodex 보상구조가 바뀌면 질문 매핑과 출력 템플릿을 함께 수동 갱신한다. 확인(OmO 4.15.0): `$ulw-loop`은 ultrawork 키워드 트리거(goal/criteria/evidence)로 동작하며 `--completion-promise`/`--max-iterations` 같은 composer 플래그를 파싱하지 않는다(그 completion_promise/max_iterations는 별도 ralph continuation의 내부 상태 필드일 뿐). `$ulw-plan`도 플래그 없이 `$ulw-plan "..."`.

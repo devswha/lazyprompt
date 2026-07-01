@@ -38,14 +38,14 @@ $ulw-prompt-builder 결제 모듈 리팩터링 계획 세우고 싶어
 
 1. **타깃 추론** — 아이디어가 `ulw-plan`(계획)용인지 `ulw-loop`(실행)용인지 추론.
 2. **바로 출력 우선** — 충분하면 질문 없이 생성하고, 부족할 때만 필요한 항목을 한 번에 질문.
-3. **3부 출력** — Part A 복붙용 명령 + Part B 구조화 본문 + Part C 플래그 선택 이유.
+3. **3부 출력** — Part A 복붙용 명령 + Part B 구조화 본문 + Part C 선택 근거.
 4. **안전한 복붙 경계** — 실제 `$ulw-plan`/`$ulw-loop`에 붙여넣을 것은 Part A의 명령뿐입니다.
 
 ## 무엇이 채워지나 (Reward structure)
 
 | 타깃 | 프롬프트에 자동으로 담기는 것 |
 | --- | --- |
-| `$ulw-loop` | 성공기준(`scenario`/`expectedEvidence`) · 완료 약속 · 적대적/엣지 케이스 · 검증 명령 · `Must-NOT` · `--completion-promise` · `--max-iterations` |
+| `$ulw-loop` | goal + tier · 성공기준(`scenario`/`expectedEvidence`) · 완료 정의(모든 criterion pass + quality gate + `checkpoint`) · 적대적/엣지 케이스 · 검증 명령 · `Must-NOT` |
 | `$ulw-plan` | 의도 신호(`CLEAR`/`UNCLEAR`/`interview-me`/`high-accuracy`) · owner-decision 표면화 · 맥락/제약 |
 
 태스크에 맞는 OmO `$`-스킬도 **선택적으로** 끼워 넣습니다 — 검증→`$lsp`/`$ast-grep`, UI→`$frontend`, 마무리→`$review-work`/`$remove-ai-slops` (매칭 없으면 넣지 않음).
@@ -95,15 +95,15 @@ $ulw-prompt-builder Node 백엔드에 로그인 API 구현시키고 싶어
 
 ```text
 Part A — 복붙용 명령
-$ulw-loop "<bullet/번호 목록 없는 한 개의 연속 브리프>" --completion-promise="<DONE>" --max-iterations=25
+$ulw-loop "<bullet/번호 목록 없는 한 개의 연속 브리프>"
 
 Part B — 구조화 본문
 - Desired outcome / Success criteria(scenario·expectedEvidence)
-- Completion promise / Adversarial cases / Verification / Must-NOT
+- Completion definition / Adversarial cases / Verification / Must-NOT
 - Optional OmO skill hints: $programming, $review-work
 
-Part C — 플래그 선택 이유
-- completion-promise / max-iterations / $skill 주입 근거
+Part C — 선택 근거
+- 완료 판정 기준 / tier / $skill 주입 근거
 ```
 
 Part A의 명령만 복사해 `$ulw-loop`(또는 `$ulw-plan`)에 붙여넣으면 끝. Part B/C는 검토용 설명입니다.
