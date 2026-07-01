@@ -34,7 +34,7 @@ $ulw-prompt-builder 결제 모듈 리팩터링 계획 세우고 싶어
 
 ## 왜 쓰나 (Why)
 
-`ulw-loop`/`ulw-plan`은 입력 프롬프트의 **구조**에 따라 결과 품질이 갈립니다. 이 스킬은 그 보상 구조를 100% 채운 프롬프트를 대신 설계해 줍니다 — 당신은 아이디어만 던지면 됩니다.
+`ulw-plan`/`ulw-loop`은 **어떻게 부탁하느냐**에 따라 결과가 크게 달라집니다. 이 스킬은 좋은 결과가 나오도록 그 부탁 문장을 대신 꼼꼼히 써 줍니다 — 당신은 하고 싶은 걸 한 줄로 던지기만 하면 됩니다.
 
 ## 동작 (How)
 
@@ -47,10 +47,10 @@ $ulw-prompt-builder 결제 모듈 리팩터링 계획 세우고 싶어
 
 | 타깃 | 프롬프트에 자동으로 담기는 것 |
 | --- | --- |
-| `$ulw-loop` | goal + tier · 성공기준(`scenario`/`expectedEvidence`) · 완료 정의(모든 criterion pass + quality gate + `checkpoint`) · 적대적/엣지 케이스 · 검증 명령 · `Must-NOT` |
-| `$ulw-plan` | 의도 신호(`CLEAR`/`UNCLEAR`/`interview-me`/`high-accuracy`) · owner-decision 표면화 · 맥락/제약 |
+| `$ulw-loop` (실행+검증 반복) | 뭘 만들지 · 다 됐는지 확인하는 법 · 언제 "끝"인지 · 조심할 상황 · 확인 방법 · 절대 하지 말 것 |
+| `$ulw-plan` (계획 먼저) | 지금 얼마나 뚜렷한지 · 당신이 직접 정할 것 · 알아둔 배경과 지킬 조건 |
 
-태스크에 맞는 OmO `$`-스킬도 **선택적으로** 끼워 넣습니다 — 검증→`$lsp`/`$ast-grep`, UI→`$frontend`, 마무리→`$review-work`/`$remove-ai-slops` (매칭 없으면 넣지 않음).
+작업에 맞는 OmO 도우미 기능(`$`-스킬)도 알아서 골라 끼워 줍니다 — 예: 코드 찾기(`$lsp`/`$ast-grep`), 화면 만들기(`$frontend`), 마무리 점검(`$review-work`/`$remove-ai-slops`). 맞는 게 없으면 넣지 않습니다.
 
 ## 설치 (Install)
 
