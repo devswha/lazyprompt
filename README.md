@@ -27,7 +27,7 @@ codex plugin marketplace add devswha/lazyprompt
 $ulw-prompt-builder 결제 모듈 리팩터링 계획 세우고 싶어
 ```
 
-스킬이 `plan` vs `loop`를 추론하고, 충분하면 바로 그대로 복붙할 수 있는 프롬프트를 3부로 뱉습니다.
+스킬이 `plan` vs `loop`를 추론하고, 충분하면 바로 그대로 복붙할 수 있는 `프롬프트` + `프롬프트 설명`을 뱉습니다.
 정말 필요한 정보가 비어 있을 때만 한 번에 묶어 묻습니다.
 
 ---
@@ -40,8 +40,8 @@ $ulw-prompt-builder 결제 모듈 리팩터링 계획 세우고 싶어
 
 1. **타깃 추론** — 아이디어가 `ulw-plan`(계획)용인지 `ulw-loop`(실행)용인지 추론.
 2. **바로 출력 우선** — 충분하면 질문 없이 생성하고, 부족할 때만 필요한 항목을 한 번에 질문.
-3. **3부 출력** — Part A 복붙용 명령 + Part B 구조화 본문 + Part C 선택 근거.
-4. **안전한 복붙 경계** — 실제 `$ulw-plan`/`$ulw-loop`에 붙여넣을 것은 Part A의 명령뿐입니다.
+3. **2부 출력** — `프롬프트`(복붙용 명령) + `프롬프트 설명`(무엇이 담겼는지 + 왜 그렇게 골랐는지).
+4. **안전한 복붙 경계** — 실제 `$ulw-plan`/`$ulw-loop`에 붙여넣을 것은 `프롬프트`뿐입니다.
 
 ## 무엇이 채워지나 (Reward structure)
 
@@ -96,21 +96,19 @@ $ulw-prompt-builder Node 백엔드에 로그인 API 구현시키고 싶어
 스킬이 `loop`를 추론하고 필요한 보상요소를 채운 뒤, 아래 형태로 출력합니다:
 
 ```text
-Part A — 복붙용 명령
+프롬프트 (복붙용 명령)
 $ulw-loop "<bullet/번호 목록 없는 한 개의 연속 브리프>"
 
-Part B — 구조화 본문
+프롬프트 설명 (검토용 — 붙여넣지 않음)
 - Desired outcome / Success criteria(scenario·expectedEvidence)
-- Completion definition / Adversarial cases / Verification / Must-NOT
+- Completion definition / Adversarial / Verification / Must-NOT
 - Optional OmO skill hints: $programming, $review-work
-
-Part C — 선택 근거
-- 완료 판정 기준 / tier / $skill 주입 근거
+- 왜 이렇게: loop 선택 이유 / tier / $skill 근거
 ```
 
-Part A의 명령만 복사해 `$ulw-loop`(또는 `$ulw-plan`)에 붙여넣으면 끝. Part B/C는 검토용 설명입니다.
+`프롬프트`만 복사해 `$ulw-loop`(또는 `$ulw-plan`)에 붙여넣으면 끝. `프롬프트 설명`은 검토용입니다.
 
-> 왜 Part A가 bullet 없는 연속 브리프인가요? `ulw-loop create-goals`는 bullet/번호 줄을 별도 goal 후보로 파싱합니다. Part A를 한 개의 연속 브리프로 유지하면 성공기준과 검증 절차는 풍부하게 전달하면서도 goal 과분할을 피할 수 있습니다.
+> 왜 `프롬프트`가 bullet 없는 연속 브리프인가요? `ulw-loop create-goals`는 bullet/번호 줄을 별도 goal 후보로 파싱합니다. `프롬프트`를 한 개의 연속 브리프로 유지하면 성공기준과 검증 절차는 풍부하게 전달하면서도 goal 과분할을 피할 수 있습니다.
 
 ## 구조 (Layout)
 

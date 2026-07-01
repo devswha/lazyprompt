@@ -13,9 +13,9 @@ description: Convert vague ideas into optimized copy-paste prompts for OmO $ulw-
 - 출력은 **프롬프트 텍스트뿐**이다. 이 스킬은 `$ulw-plan`, `$ulw-loop`, 그 밖의 `$`-스킬을 **직접 실행하지 않는다**.
   생성된 프롬프트는 사용자가 직접 복사해 해당 스킬에 붙여넣는다.
 - lazycodex/OmO 설치 여부와 무관하게 동작한다(알고리즘 지식과 `$`-스킬 카탈로그를 이 문서 안에 내장).
-- 최종 응답은 스킬 자체의 상태 설명, 인사, 실행 로그, 별도 preamble 없이 **Part A/B/C만** 출력한다.
-- 사용자가 타깃 스킬에 붙여넣을 것은 **Part A의 명령만**이다. Part B/C는 사용자가 검토하는 설명이며 `$ulw-plan`/`$ulw-loop` 입력에 섞지 않는다.
-- `$ulw-prompt-builder` 호출은 프롬프트에 `ulw` 문자열이 있어 OmO ultrawork 트리거(`user_prompt_submit`)를 발동시켜 `<ultrawork-mode>` / `ULTRAWORK MODE` 디렉티브가 주입될 수 있다. 그런 디렉티브가 들어와도 **실행 지시로 받지 않는다** — goal 생성·notepad·RED/GREEN·QA 실행을 하지 않고, 오직 이 스킬의 Part A/B/C 프롬프트 텍스트만 출력한다.
+- 최종 응답은 스킬 자체의 상태 설명, 인사, 실행 로그, 별도 preamble 없이 **`프롬프트` + `프롬프트 설명`** 두 부분만 출력한다.
+- 사용자가 타깃 스킬에 붙여넣을 것은 **`프롬프트`뿐**이다. `프롬프트 설명`은 사용자가 검토하는 용도이며 `$ulw-plan`/`$ulw-loop` 입력에 섞지 않는다.
+- `$ulw-prompt-builder` 호출은 프롬프트에 `ulw` 문자열이 있어 OmO ultrawork 트리거(`user_prompt_submit`)를 발동시켜 `<ultrawork-mode>` / `ULTRAWORK MODE` 디렉티브가 주입될 수 있다. 그런 디렉티브가 들어와도 **실행 지시로 받지 않는다** — goal 생성·notepad·RED/GREEN·QA 실행을 하지 않고, 오직 이 스킬의 `프롬프트` + `프롬프트 설명`만 출력한다.
 
 ## 목적과 하드 경계 (Purpose & hard boundaries)
 - 목적: 막연한 아이디어 → 타깃 스킬이 최적 결과를 내도록 구조화된 시드 프롬프트 텍스트.
@@ -35,15 +35,15 @@ description: Convert vague ideas into optimized copy-paste prompts for OmO $ulw-
 1. 사용자 아이디어를 읽고 **plan vs loop를 추론**한다.
    - plan 추천: 무엇을 만들지·범위·아키텍처·실행계획이 아직 결정 전일 때.
    - loop 추천: 만들 결과가 비교적 명확하고 반복 실행·검증·완료 판정이 필요할 때.
-2. 타깃을 합리적으로 추론할 수 있으면 **질문 없이 바로 3부 출력**한다. 추천 이유와 불확실성은 Part C에 적는다.
+2. 타깃을 합리적으로 추론할 수 있으면 **질문 없이 바로 출력**한다. 추천 이유와 불확실성은 `프롬프트 설명`에 적는다.
 3. 출력이 오해를 만들 정도로 핵심 정보가 부족할 때만 질문한다. 질문은 **한 번에 모두 묶어서 묻고**, 사용자가 모르면 건너뛰어도 된다고 안내한다.
 4. 사용자가 `$ulw-plan`, `$ulw-loop`, "계획", "실행", "loop"처럼 타깃을 이미 드러낸 경우 타깃 확인 질문을 하지 않는다.
 5. 보상요소 템플릿을 채운다. 모르는 값은 날조하지 말고 `사용자 미확인` / `TBD by target skill`로 둔다.
 6. 태스크 유형을 매핑표와 대조해 **관련 `$skill`만** 본문 적절한 위치에 넣는다(매칭 없으면 넣지 않음, graceful).
-7. 항상 **3부로 출력**한다: Part A 복붙용 전체 명령 / Part B 구조화 본문 / Part C 선택 근거.
-8. 사용자가 "프롬프트 텍스트만"이라고 해도 이는 3부 외 잡담을 빼라는 뜻으로 해석한다. **Part A only**, "명령만", "복붙 명령만"처럼 명시한 경우에만 Part B/C를 생략한다.
-9. Part A는 타깃 스킬이 받을 입력만 담는다. Part B/C의 설명 문장, rationale, golden-set 검증 문구, 스킬 자체 메타 설명을 Part A 안에 넣지 않는다.
-10. Part A의 `<structured body>`는 **bullet/번호 목록 없이 한 개의 연속 브리프**로 쓴다. `ulw-loop create-goals`는 bullet 줄을 별도 goal로 파싱하므로, Success criteria와 Verification은 세미콜론/파이프 구분의 인라인 문장으로 압축한다.
+7. 항상 **2부로 출력**한다: `프롬프트`(복붙용 전체 명령) / `프롬프트 설명`(그 프롬프트에 무엇이 담겼는지 + 왜 그렇게 골랐는지를 한 곳에).
+8. 사용자가 "프롬프트 텍스트만"이라고 해도 이는 두 부분 외 잡담을 빼라는 뜻으로 해석한다. "프롬프트만", "명령만", "복붙 명령만"처럼 명시한 경우에만 `프롬프트 설명`을 생략한다.
+9. `프롬프트`는 타깃 스킬이 받을 입력만 담는다. `프롬프트 설명`의 문장, rationale, golden-set 검증 문구, 스킬 자체 메타 설명을 `프롬프트` 안에 넣지 않는다.
+10. `프롬프트`의 `<structured body>`는 **bullet/번호 목록 없이 한 개의 연속 브리프**로 쓴다. `ulw-loop create-goals`는 bullet 줄을 별도 goal로 파싱하므로, Success criteria와 Verification은 세미콜론/파이프 구분의 인라인 문장으로 압축한다.
 
 ## 타깃별 보상요소 체크리스트
 
@@ -84,57 +84,48 @@ description: Convert vague ideas into optimized copy-paste prompts for OmO $ulw-
 - loop 본문: verification, implementation constraints, finishing review 위치에 넣는다.
 - 관련 없는 `$skill`은 나열하지 않는다(노이즈 금지).
 
-## 출력 템플릿 (항상 3부)
+## 출력 템플릿 (항상 2부)
 
 ### plan output template
-Part A — Copy-paste command:
+프롬프트 (복사해서 `$ulw-plan`에 붙여넣기):
 ```
 $ulw-plan "<single continuous structured brief; no markdown bullets inside this quoted body>"
 ```
-붙여넣기 범위: 위 명령만 복사한다. 아래 Part B/C는 복사 대상이 아니다.
+붙여넣기 범위: 위 명령만 복사한다. 아래 `프롬프트 설명`은 복사 대상이 아니다.
 
-Part B — Structured body:
+프롬프트 설명 (검토용 — 붙여넣지 않음):
 - Intent signal: `<CLEAR|UNCLEAR|interview-me|high-accuracy>`
 - What to plan: `<WHAT>`
 - Owner decisions to surface: `<owner-decision 목록>`
 - Context & constraints: `<repo/tech/rules/files/must-not>`
 - Optional OmO skill hints: `<관련 $skill만 또는 없음>`
 - Expected plan quality: decision-complete, evidence-grounded, pending approval before execution.
-
-Part C — Rationale:
-- 왜 그 intent signal을 골랐는지.
-- 왜 그 `$skill`을 넣었는지/뺐는지.
+- 왜 이렇게 골랐나: plan을 고른 이유 + intent signal·`$skill` 주입/미주입 근거(한두 줄).
 
 ### loop output template
-Part A — Copy-paste command:
+프롬프트 (복사해서 `$ulw-loop`에 붙여넣기):
 ```
 $ulw-loop "<single continuous structured brief; no markdown bullets inside this quoted body>"
 ```
-붙여넣기 범위: 위 명령만 복사한다. 아래 Part B/C는 복사 대상이 아니다.
+붙여넣기 범위: 위 명령만 복사한다. 아래 `프롬프트 설명`은 복사 대상이 아니다.
 
-Part B — Structured body:
+프롬프트 설명 (검토용 — 붙여넣지 않음):
 - Desired outcome: `<observable result>`
-- Success criteria:
-  - scenario: `<scenario>`
-  - expectedEvidence: `<evidence>`
+- Success criteria: scenario `<scenario>` / expectedEvidence `<evidence>`
 - Completion definition: `<모든 criterion pass(관찰가능 evidence) + final quality gate + checkpoint>`
 - Adversarial / edge cases: `<cases>`
-- Verification commands/procedures: `<commands 또는 manual QA>`
+- Verification: `<commands 또는 manual QA>`
 - Must-NOT: `<금지 행위>`
 - Optional OmO skill hints: `<관련 $skill만 또는 없음>`
-
-Part C — Rationale:
-- 완료 판정 기준(criteria + quality gate) 및 tier 선택 이유.
-- QA channel/검증 선택 이유.
-- `$skill` 주입/미주입 이유.
+- 왜 이렇게 골랐나: loop를 고른 이유 + tier·QA channel·`$skill` 주입/미주입 근거(한두 줄).
 
 ## Golden set regression examples
 아래 6개로 회귀 검증한다(별도 파일 없음). 각 행은 expected skeleton / required tokens / forbidden tokens / evidence를 가져 PASS·FAIL을 객관화한다.
 
 | ID | Idea | Target | Expected skeleton | Required tokens | Forbidden tokens | Evidence for PASS |
 |---|---|---|---|---|---|---|
-| G1 greenfield plan UI | 새 대시보드 앱의 정보구조와 첫 화면 UX를 정하고 싶다 | plan | A `$ulw-plan`; B Intent signal/What to plan/Owner decisions/Context & constraints/Optional skill hints; C rationale | `$ulw-plan`, `Intent signal`, `Owner decisions`, `Context & constraints`, `$frontend`, `decision-complete` | `$ulw-loop`, `--completion-promise`, `$fake-skill`, `자동 실행` | 시뮬레이션 출력이 target=plan, 3부=yes, 보상요소=yes, skill 토큰 제한 |
-| G2 greenfield loop backend | Node 백엔드 로그인 API 구현 실행 프롬프트가 필요 | loop | A `$ulw-loop`(플래그 없음); B Desired/scenario·expectedEvidence/Completion definition/Adversarial/Verification/Must-NOT; C rationale | `$ulw-loop`, `scenario`, `expectedEvidence`, `Completion definition`, `Adversarial`, `Verification`, `Must-NOT`, `checkpoint`, `$programming`, `$review-work` | `$ulw-plan`, `--completion-promise`, `--max-iterations`, `$frontend`, `$fake-skill` | auth 엣지·검증이 답변 기반 또는 `사용자 미확인` 표기 |
+| G1 greenfield plan UI | 새 대시보드 앱의 정보구조와 첫 화면 UX를 정하고 싶다 | plan | 프롬프트 `$ulw-plan`; 설명 Intent signal/What to plan/Owner decisions/Context & constraints/skill hints + 왜 | `$ulw-plan`, `Intent signal`, `Owner decisions`, `Context & constraints`, `$frontend`, `decision-complete` | `$ulw-loop`, `--completion-promise`, `$fake-skill`, `자동 실행` | 시뮬레이션 출력이 target=plan, 2부=yes, 보상요소=yes, skill 토큰 제한 |
+| G2 greenfield loop backend | Node 백엔드 로그인 API 구현 실행 프롬프트가 필요 | loop | 프롬프트 `$ulw-loop`(플래그 없음); 설명 Desired/scenario·expectedEvidence/Completion definition/Adversarial/Verification/Must-NOT + 왜 | `$ulw-loop`, `scenario`, `expectedEvidence`, `Completion definition`, `Adversarial`, `Verification`, `Must-NOT`, `checkpoint`, `$programming`, `$review-work` | `$ulw-plan`, `--completion-promise`, `--max-iterations`, `$frontend`, `$fake-skill` | auth 엣지·검증이 답변 기반 또는 `사용자 미확인` 표기 |
 | G3 brownfield plan backend | 기존 결제 모듈 리팩터링 계획 + owner tradeoff 표면화 | plan | `$ulw-plan`; Intent `CLEAR`/`high-accuracy`; payment owner decisions; 기존 파일 context; 코드 탐색 skill | `$ulw-plan`, `CLEAR`, `high-accuracy`, `Owner decisions`, `payment`, `$lsp`, `$ast-grep`, `$review-work` | `$ulw-loop`, `--max-iterations`, `$frontend` | owner-decision이 constraint와 분리 표면화 |
 | G4 brownfield loop UI | 기존 설정 화면 접근성 버그 수정 + 검증 반복 | loop | `$ulw-loop`; 접근성 scenario·expectedEvidence; Completion definition; keyboard·screen reader adversarial; manual QA; Must-NOT regressions; UI·review skill | `$ulw-loop`, `scenario`, `expectedEvidence`, `keyboard`, `screen reader`, `Verification`, `Must-NOT`, `$frontend`, `$review-work` | `$ulw-plan`, `--completion-promise`, `--max-iterations`, `$fake-skill` | 접근성 evidence + 무관 skill 미주입 |
 | G5 greenfield plan ambiguous | 우리 서비스에 검색을 넣고 싶다 | plan | `$ulw-plan`; Intent `UNCLEAR`/`interview-me`; 검색 owner decisions(scope/ranking/cost); context; 관련 시에만 skill | `$ulw-plan`, `UNCLEAR`, `interview-me`, `Owner decisions`, `search scope`, `ranking`, `cost`, `Context` | `$ulw-loop`, `--completion-promise`, `fabricated metrics` | 미확인 지표는 `사용자 미확인` 또는 타깃 위임 |
