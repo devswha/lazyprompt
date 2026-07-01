@@ -11,7 +11,7 @@ _Outputs prompt text only — it never auto-runs the target skill._
 
 [![license](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 [![Codex](https://img.shields.io/badge/Codex-skill%20%2B%20plugin-7C3AED?style=flat-square)](https://developers.openai.com/codex/skills)
-[![invoke](https://img.shields.io/badge/invoke-%24ulw--prompt--builder-111827?style=flat-square)](#2-사용법)
+[![invoke](https://img.shields.io/badge/invoke-%24lazyprompt-111827?style=flat-square)](#2-사용법)
 
 </div>
 
@@ -25,17 +25,17 @@ Codex에 아래 한 줄 붙여넣고 설치하면 끝:
 codex plugin marketplace add devswha/lazyprompt
 ```
 
-> GUI면 `/plugins` → **Add Marketplace** → `https://github.com/devswha/lazyprompt` 붙여넣고 `ulw-prompt-builder` 설치. 안 보이면 Codex 재시작.
+> GUI면 `/plugins` → **Add Marketplace** → `https://github.com/devswha/lazyprompt` 붙여넣고 `lazyprompt` 설치. 안 보이면 Codex 재시작.
 
 ## 2. 사용법
 
-Codex 입력창에 `$ulw-prompt-builder` 뒤에 **하고 싶은 걸 평소 말로 한 줄** 적으면 됩니다.
+Codex 입력창에 `$lazyprompt` 뒤에 **하고 싶은 걸 평소 말로 한 줄** 적으면 됩니다.
 
 ```text
-$ulw-prompt-builder 내 쇼핑몰에 상품 후기(별점+사진) 넣고 실제로 올라가는지 확인하는 프롬프트 만들어줘
+$lazyprompt 내 쇼핑몰에 상품 후기(별점+사진) 넣고 실제로 올라가는지 확인하는 프롬프트 만들어줘
 ```
 ```text
-$ulw-prompt-builder 우리 서비스에 검색 기능 넣고 싶어
+$lazyprompt 우리 서비스에 검색 기능 넣고 싶어
 ```
 
 - 뭘 만들지 뚜렷하면 → **실행+검증(`$ulw-loop`)**, 아직 막연하면 → **계획(`$ulw-plan`)** 프롬프트로 알아서 골라줍니다.
@@ -93,11 +93,11 @@ $ulw-loop "<하고 싶은 일 + 다 됐는지 확인법 + 조심할 점 + 하지
 ### 파일 구조
 
 ```text
-.agents/skills/ulw-prompt-builder/SKILL.md          # 레포에서 바로 인식되는 스킬
+.agents/skills/lazyprompt/SKILL.md                  # 레포에서 바로 인식되는 스킬
 .agents/plugins/marketplace.json                    # 마켓플레이스 매니페스트
-plugins/ulw-prompt-builder/
+plugins/lazyprompt/
 ├── .codex-plugin/plugin.json                       # Codex 플러그인 매니페스트
-└── skills/ulw-prompt-builder/SKILL.md              # 플러그인에 동봉된 스킬
+└── skills/lazyprompt/SKILL.md                      # 플러그인에 동봉된 스킬
 ```
 
 ### 안 하는 것 (Non-goals)
@@ -113,11 +113,11 @@ plugins/ulw-prompt-builder/
 # 클론해서 그 안에서 Codex 실행 (설치 0단계)
 git clone https://github.com/devswha/lazyprompt
 cd lazyprompt
-codex   # .agents/skills/ 자동 인식 → $ulw-prompt-builder 바로 사용
+codex   # .agents/skills/ 자동 인식 → $lazyprompt 바로 사용
 ```
 ```bash
 # 개인 전역 스킬로 복사 — 어느 레포에서나 사용
-cp -R .agents/skills/ulw-prompt-builder ~/.agents/skills/
+cp -R .agents/skills/lazyprompt ~/.agents/skills/
 ```
 
 </details>

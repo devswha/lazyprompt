@@ -5,10 +5,10 @@
   },
   "plugins": [
     {
-      "name": "ulw-prompt-builder",
+      "name": "lazyprompt",
       "source": {
         "source": "local",
-        "path": "./plugins/ulw-prompt-builder"
+        "path": "./plugins/lazyprompt"
       },
       "policy": {
         "installation": "AVAILABLE",

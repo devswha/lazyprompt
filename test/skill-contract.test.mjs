@@ -3,15 +3,15 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const skillPaths = [
-	".agents/skills/ulw-prompt-builder/SKILL.md",
-	"plugins/ulw-prompt-builder/skills/ulw-prompt-builder/SKILL.md",
+	".agents/skills/lazyprompt/SKILL.md",
+	"plugins/lazyprompt/skills/lazyprompt/SKILL.md",
 ];
 
 async function readSkill(path) {
 	return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
-test("ulw-prompt-builder does not require multi-turn question interviews", async () => {
+test("lazyprompt does not require multi-turn question interviews", async () => {
 	for (const path of skillPaths) {
 		const skill = await readSkill(path);
 

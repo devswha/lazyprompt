@@ -1,5 +1,5 @@
 {
-  "name": "ulw-prompt-builder",
+  "name": "lazyprompt",
   "version": "1.0.0+codex.20260701060710",
   "description": "Turn a vague idea into an optimized copy-paste prompt for lazycodex/OmO $ulw-plan or $ulw-loop. Outputs prompt text only; never runs the target skill.",
   "author": {
@@ -21,7 +21,7 @@
   ],
   "skills": "./skills/",
   "interface": {
-    "displayName": "ULW Prompt Builder",
+    "displayName": "lazyprompt",
     "shortDescription": "Optimal prompt builder for $ulw-plan / $ulw-loop",
     "longDescription": "Turns a vague idea into the optimal copy-paste prompt for lazycodex/OmO's $ulw-plan (planning) or $ulw-loop (evidence-gated execution). Recommends the target, asks only when missing information would cause a wrong prompt, fills the reward structure (loop: scenario/expectedEvidence + completion via criteria/quality-gate/checkpoint + adversarial + verification + Must-NOT; plan: intent signal + owner-decision + context), and selectively weaves in relevant OmO $-skills. Outputs prompt text only and never runs the target skill.",
     "developerName": "devswha",
@@ -33,8 +33,8 @@
     "websiteURL": "https://github.com/devswha/lazyprompt",
     "brandColor": "#7C3AED",
     "defaultPrompt": [
-      "$ulw-prompt-builder 이 아이디어를 ulw-loop 프롬프트로 만들어줘",
-      "$ulw-prompt-builder turn this idea into a $ulw-plan prompt"
+      "$lazyprompt 이 아이디어를 ulw-loop 프롬프트로 만들어줘",
+      "$lazyprompt turn this idea into a $ulw-plan prompt"
     ],
     "screenshots": []
   }
