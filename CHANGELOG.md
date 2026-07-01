@@ -11,6 +11,16 @@ via `npm run version:sync`. See [Versioning](README.md) for the release workflow
 
 ## [Unreleased]
 
+### Changed
+- **Auto-triggered deep interview (OmX-style routing).** `$lazyprompt` now gauges
+  ambiguity first: clear inputs still produce a one-shot prompt, while vague
+  inputs (broad verbs, no concrete anchors, unstable core noun) automatically
+  enter a short (`--quick`) deep interview instead of requiring a flag. Always
+  skippable with `--direct` or "그냥 만들어"/"바로"/"묻지 말고"; force/deepen with
+  `--interview` / `--quick` / `--standard` / `--deep` or interview trigger words.
+  Updated the operating-sequence routing gate, deep-interview trigger section,
+  README, and the contract test.
+
 ## [1.1.0] - 2026-07-01
 
 ### Added

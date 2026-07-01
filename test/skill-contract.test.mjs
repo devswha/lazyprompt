@@ -11,7 +11,7 @@ async function readSkill(path) {
 	return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
-test("default output stays one-shot and deep interview is opt-in", async () => {
+test("clear input stays one-shot; vague input auto-triggers a skippable interview", async () => {
 	for (const path of skillPaths) {
 		const skill = await readSkill(path);
 
@@ -23,9 +23,16 @@ test("default output stays one-shot and deep interview is opt-in", async () => {
 		assert.match(skill, /질문 없이 바로.*출력/s);
 		assert.match(skill, /한 번에.*묶어서.*묻/s);
 
-		// Deep interview is an explicit, default-off option.
+		// Clear inputs still produce a one-shot prompt (no forced gate).
+		assert.match(skill, /명확하면.*바로.*출력/s);
+
+		// Vague inputs auto-trigger the interview (OmX-style), always skippable.
 		assert.match(skill, /--interview/);
-		assert.match(skill, /딥 인터뷰는 \*\*옵션일 때만\*\* 켠다/);
+		assert.match(skill, /막연할 때 자동으로 켜진다/);
+		assert.match(skill, /--direct/);
+		assert.match(skill, /그냥 만들어/);
+
+		// Once interviewing, questions stay one-at-a-time (targeted, not fixed).
 		assert.match(skill, /한 번에 한 질문 \(딥 인터뷰 모드에서만\)/);
 	}
 });
