@@ -99,11 +99,11 @@ $ulw-prompt-builder Node 백엔드에 로그인 API 구현시키고 싶어
 프롬프트 (복붙용 명령)
 $ulw-loop "<bullet/번호 목록 없는 한 개의 연속 브리프>"
 
-프롬프트 설명 (검토용 — 붙여넣지 않음)
-- Desired outcome / Success criteria(scenario·expectedEvidence)
-- Completion definition / Adversarial / Verification / Must-NOT
-- Optional OmO skill hints: $programming, $review-work
-- 왜 이렇게: loop 선택 이유 / tier / $skill 근거
+프롬프트 설명 (읽어보기용 — 붙여넣지 마세요, 쉬운 말)
+- 뭘 시키는지 / 다 된 걸 어떻게 확인하는지
+- 언제 "끝"으로 치는지 / 조심할 상황 / 절대 하지 말 것
+- 같이 부른 도우미 기능: $programming(엄격한 구현), $review-work(끝나기 전 점검)
+- 왜 '실행+검증 반복'을 골랐는지
 ```
 
 `프롬프트`만 복사해 `$ulw-loop`(또는 `$ulw-plan`)에 붙여넣으면 끝. `프롬프트 설명`은 검토용입니다.

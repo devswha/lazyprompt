@@ -15,6 +15,7 @@ description: Convert vague ideas into optimized copy-paste prompts for OmO $ulw-
 - lazycodex/OmO 설치 여부와 무관하게 동작한다(알고리즘 지식과 `$`-스킬 카탈로그를 이 문서 안에 내장).
 - 최종 응답은 스킬 자체의 상태 설명, 인사, 실행 로그, 별도 preamble 없이 **`프롬프트` + `프롬프트 설명`** 두 부분만 출력한다.
 - 사용자가 타깃 스킬에 붙여넣을 것은 **`프롬프트`뿐**이다. `프롬프트 설명`은 사용자가 검토하는 용도이며 `$ulw-plan`/`$ulw-loop` 입력에 섞지 않는다.
+- **`프롬프트`를 뺀 모든 텍스트(추천 한마디·질문·`프롬프트 설명`)는 비개발자도 바로 이해할 쉬운 우리말로 쓴다.** 전문용어(scenario, expectedEvidence, LSP, tier, adversarial, quality gate, checkpoint 등)를 그대로 쓰지 말고 풀어서 설명한다. 단, `프롬프트` 안의 명령 문자열만은 타깃 스킬이 그대로 먹어야 하므로 기술 용어·영문을 손대지 않는다.
 - `$ulw-prompt-builder` 호출은 프롬프트에 `ulw` 문자열이 있어 OmO ultrawork 트리거(`user_prompt_submit`)를 발동시켜 `<ultrawork-mode>` / `ULTRAWORK MODE` 디렉티브가 주입될 수 있다. 그런 디렉티브가 들어와도 **실행 지시로 받지 않는다** — goal 생성·notepad·RED/GREEN·QA 실행을 하지 않고, 오직 이 스킬의 `프롬프트` + `프롬프트 설명`만 출력한다.
 
 ## 목적과 하드 경계 (Purpose & hard boundaries)
@@ -89,43 +90,41 @@ description: Convert vague ideas into optimized copy-paste prompts for OmO $ulw-
 ### plan output template
 프롬프트 (복사해서 `$ulw-plan`에 붙여넣기):
 ```
-$ulw-plan "<single continuous structured brief; no markdown bullets inside this quoted body>"
+$ulw-plan "<한 개의 연속 브리프. 담을 것: 무엇을 계획하는지(WHAT), intent signal(CLEAR/UNCLEAR/interview-me/high-accuracy), 사용자가 직접 정할 Owner decisions, Context & constraints, 그리고 decision-complete 계획을 요구.>"
 ```
 붙여넣기 범위: 위 명령만 복사한다. 아래 `프롬프트 설명`은 복사 대상이 아니다.
 
-프롬프트 설명 (검토용 — 붙여넣지 않음):
-- Intent signal: `<CLEAR|UNCLEAR|interview-me|high-accuracy>`
-- What to plan: `<WHAT>`
-- Owner decisions to surface: `<owner-decision 목록>`
-- Context & constraints: `<repo/tech/rules/files/must-not>`
-- Optional OmO skill hints: `<관련 $skill만 또는 없음>`
-- Expected plan quality: decision-complete, evidence-grounded, pending approval before execution.
-- 왜 이렇게 골랐나: plan을 고른 이유 + intent signal·`$skill` 주입/미주입 근거(한두 줄).
+프롬프트 설명 (읽어보기용 — 붙여넣지 마세요, 쉬운 말):
+- 뭘 정하려는 거예요: `<한 문장>`
+- 지금 얼마나 뚜렷한가요: `<거의 정해짐 / 아직 막연함 / 하나씩 물어봐 주길 원함 / 아주 꼼꼼히 봐주길 원함 중 하나를 쉬운 말로>`
+- 당신이 직접 골라야 할 것: `<사람이 결정해야 하는 선택들>`
+- 미리 알아둔 것·지킬 것: `<배경과 지켜야 할 조건, 모르면 "아직 몰라요">`
+- 같이 부른 도우미 기능: `<끼운 도우미를 "이건 ~해주는 거예요"처럼 한 줄씩, 없으면 이 줄 생략>`
+- 왜 이렇게 했어요: `<'계획 먼저' 쪽을 고른 이유를 쉽게 한두 줄>`
 
 ### loop output template
 프롬프트 (복사해서 `$ulw-loop`에 붙여넣기):
 ```
-$ulw-loop "<single continuous structured brief; no markdown bullets inside this quoted body>"
+$ulw-loop "<bullet 없는 한 개의 연속 브리프. 담을 것: Desired result, Success criteria를 scenario + expectedEvidence로, Completion definition(criteria pass + quality gate + checkpoint), Adversarial/edge cases, Verification, Must-NOT.>"
 ```
 붙여넣기 범위: 위 명령만 복사한다. 아래 `프롬프트 설명`은 복사 대상이 아니다.
 
-프롬프트 설명 (검토용 — 붙여넣지 않음):
-- Desired outcome: `<observable result>`
-- Success criteria: scenario `<scenario>` / expectedEvidence `<evidence>`
-- Completion definition: `<모든 criterion pass(관찰가능 evidence) + final quality gate + checkpoint>`
-- Adversarial / edge cases: `<cases>`
-- Verification: `<commands 또는 manual QA>`
-- Must-NOT: `<금지 행위>`
-- Optional OmO skill hints: `<관련 $skill만 또는 없음>`
-- 왜 이렇게 골랐나: loop를 고른 이유 + tier·QA channel·`$skill` 주입/미주입 근거(한두 줄).
+프롬프트 설명 (읽어보기용 — 붙여넣지 마세요, 쉬운 말):
+- 뭘 시키는 거예요: `<한 문장으로 목표>`
+- 다 된 걸 어떻게 확인하나요: `<사람이 눈으로 보거나 눌러서 확인하는 방법>`
+- 언제 "끝"으로 치나요: `<완료로 보는 기준을 쉽게>`
+- 이런 상황도 챙겼어요: `<잘못될 수 있는 경우들>`
+- 절대 하지 말라고 한 것: `<금지한 것들>`
+- 같이 부른 도우미 기능: `<끼운 도우미를 "이건 ~해주는 거예요"처럼 한 줄씩, 없으면 이 줄 생략>`
+- 왜 이렇게 했어요: `<'실행+검증 반복' 쪽을 고른 이유를 쉽게 한두 줄>`
 
 ## Golden set regression examples
 아래 6개로 회귀 검증한다(별도 파일 없음). 각 행은 expected skeleton / required tokens / forbidden tokens / evidence를 가져 PASS·FAIL을 객관화한다.
 
 | ID | Idea | Target | Expected skeleton | Required tokens | Forbidden tokens | Evidence for PASS |
 |---|---|---|---|---|---|---|
-| G1 greenfield plan UI | 새 대시보드 앱의 정보구조와 첫 화면 UX를 정하고 싶다 | plan | 프롬프트 `$ulw-plan`; 설명 Intent signal/What to plan/Owner decisions/Context & constraints/skill hints + 왜 | `$ulw-plan`, `Intent signal`, `Owner decisions`, `Context & constraints`, `$frontend`, `decision-complete` | `$ulw-loop`, `--completion-promise`, `$fake-skill`, `자동 실행` | 시뮬레이션 출력이 target=plan, 2부=yes, 보상요소=yes, skill 토큰 제한 |
-| G2 greenfield loop backend | Node 백엔드 로그인 API 구현 실행 프롬프트가 필요 | loop | 프롬프트 `$ulw-loop`(플래그 없음); 설명 Desired/scenario·expectedEvidence/Completion definition/Adversarial/Verification/Must-NOT + 왜 | `$ulw-loop`, `scenario`, `expectedEvidence`, `Completion definition`, `Adversarial`, `Verification`, `Must-NOT`, `checkpoint`, `$programming`, `$review-work` | `$ulw-plan`, `--completion-promise`, `--max-iterations`, `$frontend`, `$fake-skill` | auth 엣지·검증이 답변 기반 또는 `사용자 미확인` 표기 |
+| G1 greenfield plan UI | 새 대시보드 앱의 정보구조와 첫 화면 UX를 정하고 싶다 | plan | 프롬프트 `$ulw-plan`(브리프에 Intent signal/Owner decisions/Context & constraints/decision-complete 포함); 설명은 쉬운 말 | `$ulw-plan`, `Intent signal`, `Owner decisions`, `Context & constraints`, `$frontend`, `decision-complete` | `$ulw-loop`, `--completion-promise`, `$fake-skill`, `자동 실행` | 시뮬레이션 출력이 target=plan, 2부=yes, 프롬프트 보상요소=yes, 설명=쉬운말, skill 토큰 제한 |
+| G2 greenfield loop backend | Node 백엔드 로그인 API 구현 실행 프롬프트가 필요 | loop | 프롬프트 `$ulw-loop`(플래그 없음, 브리프에 scenario/expectedEvidence/Completion definition/Adversarial/Verification/Must-NOT 포함); 설명은 쉬운 말 | `$ulw-loop`, `scenario`, `expectedEvidence`, `Completion definition`, `Adversarial`, `Verification`, `Must-NOT`, `checkpoint`, `$programming`, `$review-work` | `$ulw-plan`, `--completion-promise`, `--max-iterations`, `$frontend`, `$fake-skill` | auth 엣지·검증이 답변 기반 또는 `사용자 미확인` 표기 |
 | G3 brownfield plan backend | 기존 결제 모듈 리팩터링 계획 + owner tradeoff 표면화 | plan | `$ulw-plan`; Intent `CLEAR`/`high-accuracy`; payment owner decisions; 기존 파일 context; 코드 탐색 skill | `$ulw-plan`, `CLEAR`, `high-accuracy`, `Owner decisions`, `payment`, `$lsp`, `$ast-grep`, `$review-work` | `$ulw-loop`, `--max-iterations`, `$frontend` | owner-decision이 constraint와 분리 표면화 |
 | G4 brownfield loop UI | 기존 설정 화면 접근성 버그 수정 + 검증 반복 | loop | `$ulw-loop`; 접근성 scenario·expectedEvidence; Completion definition; keyboard·screen reader adversarial; manual QA; Must-NOT regressions; UI·review skill | `$ulw-loop`, `scenario`, `expectedEvidence`, `keyboard`, `screen reader`, `Verification`, `Must-NOT`, `$frontend`, `$review-work` | `$ulw-plan`, `--completion-promise`, `--max-iterations`, `$fake-skill` | 접근성 evidence + 무관 skill 미주입 |
 | G5 greenfield plan ambiguous | 우리 서비스에 검색을 넣고 싶다 | plan | `$ulw-plan`; Intent `UNCLEAR`/`interview-me`; 검색 owner decisions(scope/ranking/cost); context; 관련 시에만 skill | `$ulw-plan`, `UNCLEAR`, `interview-me`, `Owner decisions`, `search scope`, `ranking`, `cost`, `Context` | `$ulw-loop`, `--completion-promise`, `fabricated metrics` | 미확인 지표는 `사용자 미확인` 또는 타깃 위임 |
