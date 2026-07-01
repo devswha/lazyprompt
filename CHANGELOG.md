@@ -20,6 +20,11 @@ via `npm run version:sync`. See [Versioning](README.md) for the release workflow
   `--interview` / `--quick` / `--standard` / `--deep` or interview trigger words.
   Updated the operating-sequence routing gate, deep-interview trigger section,
   README, and the contract test.
+- **Clarified the ulw delegation boundary.** Made explicit that deep planning,
+  iterative execution, verification, completion judgement, and state are
+  delegated to the target `$ulw-plan`/`$ulw-loop` (ulw); lazyprompt interviews
+  only enough to seed a strong ulw prompt and does not duplicate `$ulw-plan`'s
+  own planning/interview.
 
 ## [1.1.0] - 2026-07-01
 

@@ -24,6 +24,7 @@ description: Convert vague ideas into optimized copy-paste prompts for OmO $ulw-
 - 자동 실행 금지: `$ulw-plan`, `$ulw-loop`, `$lsp`, `$ast-grep` 등은 **출력 텍스트 안에만** 등장한다.
 - 날조 금지: 사용자가 확인하지 않은 성공기준·제약은 지어내지 않는다. 모르면 `사용자 미확인` 또는 `TBD by target skill`로 표시.
 - 카탈로그 밖 `$skill`은 만들지 않는다.
+- 위임 경계: 깊은 계획·반복 실행·검증·완료 판정·상태 관리는 타깃 `$ulw-plan`/`$ulw-loop`(ulw)이 맡는다. 이 스킬은 **ulw가 잘 먹는 시드 프롬프트를 쓰는 데까지만** 하고, `$ulw-plan`이 스스로 하는 계획·질문을 중복하지 않는다.
 
 ## Non-goals
 1. 대상 스킬(`$ulw-plan`/`$ulw-loop`)을 자동 실행하지 않는다.
@@ -55,6 +56,7 @@ description: Convert vague ideas into optimized copy-paste prompts for OmO $ulw-
 ## 딥 인터뷰 모드 (막연하면 자동 발동 · GJC deep-interview 알고리즘 이식)
 
 딥 인터뷰는 **막연할 때 자동으로 켜진다**(OmX 방식). 자동 발동 시 기본 깊이는 **quick(짧게)** 이고, 명확한 입력이면 켜지지 않고 바로 2부 출력한다. `--direct`/"그냥 만들어"로 언제든 스킵할 수 있고, `--deep`류로 더 깊게 강제할 수 있다.
+인터뷰의 목적은 **ulw 프롬프트를 채울 만큼의 명료화**뿐이다 — 깊이·상태·반복 실행·검증은 ulw에 위임하므로, 필요 이상으로 파고들지 말고 시드가 충분해지면 바로 크리스털라이즈한다.
 
 ### 언제 켜지나 / 스킵·조절
 - **자동(기본)**: 위 "동작 순서 0"의 막연 신호가 잡히면 질문 없이 곧장 딥 인터뷰(quick)로 들어간다.
